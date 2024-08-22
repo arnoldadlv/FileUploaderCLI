@@ -1,51 +1,80 @@
 #!/bin/bash
 
-verifyazCli=$(command -v az) 
-installedVerify=$(echo $?)
+fileName=""
+storageAccountName=""
+containerName=""
 
-#echo $installedVerify
+#Checks for argument usage
+for i in "$@"; do
+    case "$i" in
+        "--help")
+        echo "Usage: upload.sh [options...]"
+        echo "--help                  Get help for commands"
+        echo "--file-name [name]      Specify the file to upload"
+        echo "--storage-account [name] Specify the Azure storage account"
+        exit 0
+        shift
+        ;;
 
-if [ "$installedVerify" == 0 ]
+        "--file-name")
+        shift
+        fileName=$1
+        shift
+        if [ -z $fileName ]
+        then
+            read -p "Please enter the name of the file you wish to upload: " fileName        
+        fi
+        ;;
+
+        "--storage-account")
+        shift
+        storageAccountName=$1
+        shift
+        if [ -z $storageAccountName ]
+        then   
+            read -p "Please enter the name of your storage account: " storageAccountName
+        fi
+        ;;
+
+        "--container")
+        shift
+        containerName=$1
+        shift
+        if [ -z $containerName ]
+        then
+            read -p "Please enter the name of the container in your storage account: " containerName
+        fi
+        ;;
+    esac
+done
+
+#Checks if any of the variables are empty, if they are, it prompts the user to fill it out
+if [ -z "$fileName" ]
 then
+    read -p "Please enter the name of the file you wish to upload: " fileName
+fi
+
+if [ -z "$storageAccountName" ]
+then
+    read -p "Please enter the name of the storage account you wish to upload to: " storageAccountName
+fi
+
+if [ -z "$containerName" ]
+then
+    read -p "Please enter the name of the container you wish to upload to: " containerName
+fi
+
+if [ -f $fileName ]; then 
     :
-    #echo "You have az cli installed."
 else
-    echo "Install az cli."
-    exit 0
+    echo "Error: The file '$fileName' does not exist"
+    exit 1
 fi
 
-if [ "$1" == "--help" ]
-then
-    echo "Usage: curl [options...]"
-    echo "--help    Get help for commands"
-    exit 0
-fi
+
+echo "Name of file to upload: ${fileName}"
+echo "Name of storage account: ${storageAccountName}"
+echo "Name of container: ${containerName}"
 
 az login
-
-read -p "Enter your filepath: " filePath
-##filePath=$1
-
-if [ -z "$filePath" ]
-then
-    echo "Please enter a file you want to upload"
-else
-    if [ -f "$filePath" ]
-        then
-            echo "This exists"
-
-        else
-            echo "This file does not exist"
-        fi
-fi
-
-read -p "Enter the name of your storage account: " storageAccountName
-
-read -p "Enter the name of a container in your storage account: " containerName
-
-az storage blob upload --account-name $storageAccountName --container-name $containerName --file $filePath --verbose
-
-#if [ storageAccountName ]
-#then
-#    az storage blob upload --account-name $storageAccountName --container-name $containerName --file $filePath
-#fi
+az storage blob upload --account-name $storageAccountName --container-name $containerName --file $fileName --verbose
