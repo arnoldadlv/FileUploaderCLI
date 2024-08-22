@@ -5,12 +5,20 @@ installedVerify=$(echo $?)
 
 #echo $installedVerify
 
-if [ $installedVerify == 0 ]
+if [ "$installedVerify" == 0 ]
 then
     :
     #echo "You have az cli installed."
 else
     echo "Install az cli."
+    exit 0
+fi
+
+if [ "$1" == "--help" ]
+then
+    echo "Usage: curl [options...]"
+    echo "--help    Get help for commands"
+    exit 0
 fi
 
 az login
@@ -18,7 +26,7 @@ az login
 read -p "Enter your filepath: " filePath
 ##filePath=$1
 
-if [ -z $filePath ]
+if [ -z "$filePath" ]
 then
     echo "Please enter a file you want to upload"
 else
