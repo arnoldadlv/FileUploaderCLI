@@ -1,6 +1,5 @@
-# FileUploaderCLI
 
-# FileUploaderCLI
+FileUploaderCLI
 
 Description:
 A bash-based CLI tool that uploads files into an Azure storage account. This tool provides a simple way to manage file uploads by interacting with Azure's API and using the Azure CLI for authentication and file handling.
